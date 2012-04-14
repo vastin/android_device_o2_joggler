@@ -1,0 +1,92 @@
+joggler_info()
+{
+	# common for joggler models
+	FB0DEV=psb_gfx
+	PREDEV=snd-hda-codec-sigmatel
+	SNDDEV=snd-hda-intel
+	WIFDEV=rt2800usb
+	LANDEV=r8168
+}
+
+joggler_load_firmware()
+{
+	FW_PATH="/sys/class/firmware/${FW_DEVNAME}"
+
+	COUNT=0
+	while [ ! -d ${FW_PATH} ]; do
+		usleep 100000
+		COUNT=`expr $COUNT + 1`
+		if [ $COUNT -gt 10 ]; then
+			break;
+		fi
+	done
+	echo 1 > ${FW_PATH}/loading
+	cat ${FW_FILE_PATH} > ${FW_PATH}/data
+	echo 0 > ${FW_PATH}/loading
+
+	COUNT=0
+	while [ -d ${FW_PATH} ]; do
+		usleep 100000
+		COUNT=`expr $COUNT + 1`
+		if [ $COUNT -gt 10 ]; then
+			break;
+		fi
+	done
+}
+
+detect_hardware()
+{
+
+	ip link set address ${ETH_MAC} dev eth0
+
+	#enable TS
+#	/system/bin/iowrite 0x1de 0x5a	&> /dev/null
+#	/system/bin/iowrite 0x1df 0xa5	&> /dev/null
+#	/system/bin/ioread 0x1de &> /dev/null
+
+	#for debugging of GFX driver
+	if [ -n "$VDEBUG" ]; then
+		mknod /dev/sda1 b 8 33
+		mkdir /t
+		mount /dev/sda1 /t
+		insmod /t/drm-psb.ko
+		modprobe i2c-algo-bit
+		insmod /t/psb.ko&
+		FW_DEVNAME="0000:00:02.0"
+		FW_FILE_PATH="/system/lib/firmware/msvdx_fw.bin"
+		joggler_load_firmware
+		mknod /dev/fb0 c 29 0
+	fi
+
+	#for debuggin of libraries
+	if [ -n "$LDEBUG" ]; then
+		mknod /dev/sda1 b 8 33
+		mkdir /t
+		mount /dev/sda1 /system/lib
+	fi
+
+
+
+	#load psb driver
+#		modprobe i2c-algo-bit
+#		insmod /system/lib/modules//drm-psb.ko
+#		insmod /system/lib/modules//psb.ko&
+#		insmod /system/lib/modules/emgd.ko&
+#		insmod /mnt/mrst_gfx.ko&
+
+#		FW_DEVNAME="0000:00:02.0"
+#		FW_FILE_PATH="/system/lib/firmware/msvdx_fw.bin"
+#		FW_FILE_PATH="/system/lib/firmware/emgd.bin"
+#		joggler_load_firmware
+
+	joggler_info
+
+if [ -z "${ETH_MAC}" ]; then
+	echo "Using a fake MAC for eth0!"
+	echo "You can also set the MAC by adding ETH_MAC=XX:XX:XX:XX:XX:XX in grub.cfg"
+	ETH_MAC="00:11:22:33:44:55"
+fi
+
+echo "Setting MAC for eth0 to '${ETH_MAC}'"
+ip link set address ${ETH_MAC} dev eth0
+}

@@ -1,0 +1,12 @@
+on boot
+    chown system system /sys/class/backlight/openframe-bl/brightness
+    chown system system /sys/class/backlight/openframe-bl/bl_power
+    chmod 0660 /sys/class/backlight/openframe-bl/brightness
+    chmod 0660 /sys/class/backlight/openframe-bl/bl_power
+
+service amixer /system/bin/alsa_amixer set Master 30
+    oneshot
+    disabled
+
+on property:dev.bootcomplete=1
+    start amixer
