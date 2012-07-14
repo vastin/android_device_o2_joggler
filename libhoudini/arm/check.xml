@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkroot>
+    <filter>org.mozilla.fennec</filter>
+    <filter>org.mozilla.firefox_beta</filter>
+    <filter>com.doubleTwist.androidPlayer</filter>
+    <filter>com.adobe.flashplayer</filter>
+    <filter>com.netflix.mediaclient</filter>
+    <filter>com.good.android.gfe</filter>
+</checkroot>

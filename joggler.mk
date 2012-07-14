@@ -7,6 +7,8 @@ PRODUCT_COPY_FILES := \
 
 $(call inherit-product,$(SRC_TARGET_DIR)/product/generic_x86.mk)
 
+$(call inherit-product-if-exists, $(LOCAL_PATH)/libhoudini.mk)
+
 PRODUCT_NAME := joggler
 PRODUCT_DEVICE := joggler
 PRODUCT_MANUFACTURER := O2

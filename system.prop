@@ -6,6 +6,9 @@ debug.egl.hw = 0
 debug.logcat=0
 system_init.startsurfaceflinger=0
 
+# add libhoudini (ARM binary translator) support
+ro.product.cpu.abi2=armeabi
+
 # default value of brightness
 settings.display.brightness=143
 
